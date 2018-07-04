@@ -62,7 +62,7 @@ for match in matches:
 
     game_file = base_file+game_name+".csv"
     with open(game_file,'w') as f:
-        f.write("Game,Date,Header,Name,Line\n")
+        f.write("Game,Date,Header,Name,Line,Odds\n")
         f.close()
 
     #match_soup.find_all("div", class_="title multiple-events") 
