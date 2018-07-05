@@ -124,7 +124,25 @@ lines = match_soup.find_all("div", class_="gl-MarketGroup ")
 
 #Checks Market Group Name against list to work out what format the table is in
 for l in lines:
-    print(test_format(l))
+    #line = l.get_text(',').split(',')
+    line = re.sub(',\xa0','',l.get_text(',')).split(',')
+    # with open(game_file, 'a') as gf:
+    #     # gf.write(game_name+","+game_date+","+line_header+","+line_names[i].text.strip()+","+line_lines[i].text.strip()+"\n")
+    #     gf.write(str(line)+"\n")
+        
+    if len(line) == 3:
+        print(line[0]+"  2 columns")
+    elif   len(line) == 5:
+        print(line[0]+" 3 columns")
+    elif   len(line) == 7:
+        print(line[0]+" 3 columns")
+    elif   len(line) == 9:
+        print(line[0]+" 4 columns")
+    elif len(line)== 11:
+        print(line[0]+" 4 columns")
+    else:
+        print("Not found")
+        #print(test_format(l))
 
 print("Done")    
 #for l in lines:
@@ -160,3 +178,5 @@ for t in lines:
     with open(game_file, 'a') as gf:
         # gf.write(game_name+","+game_date+","+line_header+","+line_names[i].text.strip()+","+line_lines[i].text.strip()+"\n")
         gf.write(str(t.get_text(',').split(','))+"\n")
+
+
