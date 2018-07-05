@@ -157,4 +157,6 @@ print("complete")
 #split odd-getting into functions
 #make list at top of script to only search existing 
 for t in lines:
-    t.get_text(',').split(',')
+    with open(game_file, 'a') as gf:
+        # gf.write(game_name+","+game_date+","+line_header+","+line_names[i].text.strip()+","+line_lines[i].text.strip()+"\n")
+        gf.write(str(t.get_text(',').split(','))+"\n")
