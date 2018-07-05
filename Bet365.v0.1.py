@@ -11,7 +11,63 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 
+def format_1col(my_code):
+    for t1 in test_1_col:
+        text = l.find(text=re.compile('^'+t1+'$'))
+        if text:
+            return text
+    return my_code.text
+def format_2col(my_code):
+    for t2 in test_2_col:
+        text = l.find(text=re.compile('^'+t2+'$'))
+        if text:
+            return text
+    return my_code.text
+def format_3col(my_code):
+    for t3 in test_3_col:
+        text = l.find(text=re.compile('^'+t3+'$'))
+        if text:
+            return text
+    return my_code.text
+def format_4col(my_code):
+    text_list = []
+    for t4 in test_4_col:
+        if my_code.find(text=re.compile(t4)):
+            #line_header=l.find("span",class_="gl-MarketGroupButton_Text").text.strip()
+            line_headers=my_code.find_all("div",class_="gl-MarketColumnHeader ")
+            #line_details = l.find("table", {"class" : re.compile("single-event-table*")})
+            line_names = my_code.find_all("div", class_="gl-ParticipantRowName ")
+            line_lines = my_code.find_all("span", class_="gl-ParticipantCentered_Name")
+            line_odds = my_code.find_all("span",class_="gl-ParticipantCentered_Odds")
+            #print(len(line_headers),len(line_names),len(line_lines),len(line_odds))
+            for i in range(len(line_headers)-1):
+                for x in range(len(line_names)):
+                    text_list.append(game_name+","+game_date+","+line_headers[i+1].text.strip()+","+line_names[x].text.strip()+" "+line_lines[x].text.strip()+","+line_odds[x].text.strip())
+            #print(text_list)
+            return text_list 
+    return
+
+def test_format(code_data):
+    code_test = format_1col(code_data)
+    if(code_test is None):
+        code_test = format_2col(code_data)
+        if(code_test is None):
+            code_test = format_3col(code_data)
+            if(code_test is None):
+                code_test = format_4col(code_data)
+                if(code_test is None):
+                    return("data not found")
+    return code_test 
+
+
+
+
 test="C:\\Temp\\Results\\Bet365\\xml.xml"
+test_1_col =["Alternative Handicaps"]
+test_3_col =["Winning Margin","1st Quarter Lines","1st Half","Disposal Specials","Team Total Points","Team Total Goals","Team Goals (Bands)","Team Early Goal","1st Quarter Winning Margin","1st Quarter Winning Margin 5-Way","1st Quarter Team Total Points","Team - 1st Quarter Total Scoring"]
+test_2_col =["Alternative Match Total"]
+test_4_col =["Game Lines","Goal Scorers","1st Quarter Race to (Points)","Game Lines","1st Half Race to (Points)"]
+len(test_1_col+test_2_col+test_3_col+test_4_col)
 #Set website base url
 base_url = "https://www.bet365.com"
 sports_url = base_url+"/sports-betting"
@@ -65,8 +121,15 @@ with open(game_file,'w') as f:
 
 #match_soup.find_all("div", class_="title multiple-events") 
 lines = match_soup.find_all("div", class_="gl-MarketGroup ") 
-#for l in lines:    
-l = lines[1]
+
+#Checks Market Group Name against list to work out what format the table is in
+for l in lines:
+    print(test_format(l))
+
+print("Done")    
+#for l in lines:
+#     
+l = lines[0]
 #line_header=l.find("span",class_="gl-MarketGroupButton_Text").text.strip()
 line_headers=l.find_all("div",class_="gl-MarketColumnHeader ")
 #line_details = l.find("table", {"class" : re.compile("single-event-table*")})
@@ -76,7 +139,7 @@ line_odds = l.find_all("span",class_="gl-ParticipantCentered_Odds")
 print(len(line_headers),len(line_names),len(line_lines),len(line_odds))
 for i in range(len(line_headers)-1):
     for x in range(len(line_names)):
-        print(game_name+","+game_date+","+line_headers[i+1].text.strip()+","+line_names[x].text.strip()+" "+line_lines[x].text.strip()+","+line_odds[x].text.strip()+"\n")
+        print(game_name+","+game_date+","+line_headers[i+1].text.strip()+","+line_names[x].text.strip()+" "+line_lines[x].text.strip()+","+line_odds[x].text.strip())
 
     # with open(game_file, 'a') as gf:
         # gf.write(game_name+","+game_date+","+line_header+","+line_names[i].text.strip()+","+line_lines[i].text.strip()+"\n")
@@ -90,35 +153,8 @@ print("complete")
 # game_links = b_driver.find_elements_by_xpath("//div[@class='sl-CouponFixtureLinkParticipant_Name ']")
 
 
-
-
-
-
-# new_soup = BeautifulSoup(b_driver.page_source, 'lxml')
-# for i in sports:
-#     #print(i.text)
-#     if i.text.strip() == "Australian Rules":
-#         ahref=i.a.get('href')
-
-# #adjust url and go to sports specific page
-# sports_link=base_url+ahref
-# b_driver.get(sports_link)
-# matches_soup = BeautifulSoup(b_driver.page_source, 'lxml')
-
-# #get list of all matches in sport (TEST to confirm ALL sports listed)
-# matches=matches_soup.find_all("span", class_="other-matches")
-
-# #parse through each match
-# for match in matches:
-#     #match = matches[0]
-#     match_href=base_url+match.a.get('href')
-#     b_driver.get(match_href)
-
-#     #clicks through page to expand all panes
-#     clicks=b_driver.find_elements_by_xpath("//*[@class='drop-down-header clearfix closed  ']")
-#     for i in range(len(clicks)):
-#         print(i)
-#         clicks[len(clicks)-1].click()
-#         time.sleep(1)
-#         clicks=b_driver.find_elements_by_xpath("//*[@class='drop-down-header clearfix closed  ']")
-
+#make list of 3-column and 2-column odds?
+#split odd-getting into functions
+#make list at top of script to only search existing 
+for t in lines:
+    t.get_text(',').split(',')
